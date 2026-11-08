@@ -2,7 +2,7 @@
 
 Projeto de estudo em Python voltado à automação de diagnósticos de infraestrutura.
 
-Atualmente, consulta registros DNS do tipo A, apresenta os endereços IPv4
+Atualmente, consulta registros DNS do tipo A e AAAA, apresenta os endereços IPv4 e IPv6
 retornados e o TTL, com tratamento de erros de resolução.
 
 A verificação de certificados HTTPS está planejada para as próximas etapas.

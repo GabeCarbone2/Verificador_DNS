@@ -1,5 +1,5 @@
 import dns.resolver
-import socket
+import dns.exception
 
 print("Verificador de DNS e HTTPS")
 
@@ -8,34 +8,38 @@ dominio = input("Digite um domínio, como example.com: ").strip()
 if not dominio:
     print("Você precisa informar um domínio.")
 else:
-    print(f"Consultando Registros A de: {dominio}")
+    tipos_registros = ["A", "AAAA"]
 
-    try:
-        resposta = dns.resolver.resolve(
-            dominio,
-            "A",
-            lifetime=5,
-            search=False
-        )
-        print("Consulta realizada com sucesso.")
+    for tipo in tipos_registros:
+        try:
+            resposta = dns.resolver.resolve(
+                dominio,
+                tipo,
+                lifetime=5,
+                search=False
+            )
+            print(f"Consulta de registro {tipo} realizada com sucesso.")
 
-        for registro in resposta:
-            print(f"Registro A encontrado: {registro.address}")
+            for registro in resposta:
+                if tipo == "A":
+                    print(f"Registro A encontrado: {registro.address}")
+                elif tipo == "AAAA":
+                    print(f"Registro AAAA encontrado: {registro.address}")
 
-        print(f"TTL: {resposta.rrset.ttl} segundos")
-        
-    except dns.resolver.NXDOMAIN:
-        print("O DNS respondeu que o nome consultado não existe.")
+            print(f"TTL: {resposta.rrset.ttl} segundos")
 
-    except dns.resolver.NoAnswer:
-        print("O DNS respondeu, mas não retornou registros do tipo A.")
+        except dns.resolver.NXDOMAIN:
+            print(f"O DNS respondeu que o nome consultado não existe para o tipo {tipo}.")
 
-    except dns.exception.Timeout:
-        print("Não foi possível obter uma resposta dentro do prazo.")
+        except dns.resolver.NoAnswer:
+            print(f"O DNS respondeu, mas não retornou registros do tipo {tipo}.")
 
-    except dns.resolver.NoNameservers as erro:
-        print("Os servidores DNS consultados não forneceram uma resposta utilizável.")
-        print(f"Detalhes: {erro}")
+        except dns.exception.Timeout:
+            print(f"Não foi possível obter uma resposta dentro do prazo para o tipo {tipo}.")
 
-    except dns.exception.DNSException as erro:
-        print(f"Ocorreu outro erro na consulta DNS: {erro}")
+        except dns.resolver.NoNameservers as erro:
+            print(f"Os servidores DNS consultados não forneceram uma resposta utilizável para o tipo {tipo}.")
+            print(f"Detalhes: {erro}")
+
+        except dns.exception.DNSException as erro:
+            print(f"Ocorreu outro erro na consulta DNS para o tipo {tipo}: {erro}")
